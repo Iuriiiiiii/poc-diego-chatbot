@@ -23,7 +23,7 @@ function App() {
       videoContainer.current.play();
     }
 
-    console.log(videos.at(0) || baseVideo);
+    console.log('Video: ', videos.at(0) || baseVideo);
   }, [videos.length]);
 
   async function getOpenaiAnswer(text: string) {
@@ -59,7 +59,10 @@ function App() {
 
     if (createVideo.status === 201) {
       const interval = setInterval(async () => {
+        console.time('Synthesia get video request');
         const getVideo = await synth.request(new SynthesiaGetVideo(createVideo.data.id));
+        console.timeEnd('Synthesia get video request');
+
 
         console.log({ status: getVideo.data.status });
 
@@ -95,8 +98,8 @@ function App() {
     getSynthesiaVideo(chatGPTAnswer, (response) => {
       setMessages([...messages, chatGPTAnswer]);
       setVideos([...videos, response.download!]);
-      console.log(response.download);
-      console.timeEnd("Synthesia");
+      // console.log(response.download);
+      // console.timeEnd("Synthesia");
 
     });
     // pushVideo('https://synthesia-ttv-data.s3.amazonaws.com/video_data/ac551166-72c8-462d-a062-8faab059bc36/transfers/target_transfer.mp4?response-content-disposition=attachment%3Bfilename%3D%22Synthesia%20video%20-%20ac5511.mp4%22&AWSAccessKeyId=ASIA32NGJ5TS6MSQ7ADN&Signature=D54KVOa%2FEgoAQ1u4rIal%2BR0J2zw%3D&x-amz-security-token=IQoJb3JpZ2luX2VjEFIaCWV1LXdlc3QtMSJHMEUCIQDIBCPCWiP8dIsOhlZOom7rk4xAgjhhOD1a6pZtI0E4zwIgDDKSMYMGssgE3i17ZE%2Bh28qO03u8hqN1DDXdSGkVw2oqlgMI2%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FARACGgw4MTI2MzQ0Njc1NTciDFk69B5UzrdpaAXqPCrqAgOlAFP2anOk%2FaqwpFCSLZ70NcuEzfY08Uh1ajrknyKhD43gGoKSIduJlZRJpJjLSDXji6xbU9fYbBgtRV%2BKq%2Bq1UjqrE70yI8FRHsX8fpp25wXV6j2MRUp90HtUpxiwXCtGOKXkQlUAXGo4de1zPRlYVuLowLL0wPxoGtCuh3fvYJEcqlyBaAy%2FZhrMvDBu28vFUBtgEpWDHfUDFG%2FaEceAOXr6591XxQowe5QyMdqAxvojk3a0Rqu7OKIjcCxMoR9rc6umPJ2UHD6HPspCctYju5hkbAjvvFpIVWPu1t9yERyLTi%2BmdA%2BmKM4WlvNwWx9omemVdDwIfv47nXohxOOkf7RcZ1Hyc8B8HEel257WXjWdjobYQsR5p8BgiMmAHAf0WiL3Ofu3qHP3QSY%2BG81OpXKIF9jR61KQ4j6m%2FOaw3hjocoX8si3AOiZsjBBWZhzen9rWi5NT7VHGYXelbNjMSixn%2BWMm%2FsfZMJHOpJ8GOp0BaqfXFDGSzrd1vH3sZvSUVCbFZJkden7ggK9U1zeFtmQnRuDhY69SCbiGDuhsXQcjDokZFjTVhEOTwOt58879Y1tX3IcQoX1mdnCleQUNWUgIJ%2B1%2Fr0p9lT4%2BajFn00MfVGLhiNYuXF6YrFZEmW4%2Bu5XLMTLd0qxUa87Kk%2FIU7VpCf7eChVOxi0LkIAYMAaiqN9OgN87hTSr1dcfdiQ%3D%3D&Expires=1676246085');
