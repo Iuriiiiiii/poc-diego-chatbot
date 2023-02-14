@@ -39,7 +39,6 @@ export interface InputConfig {
     background?: InputBackgroundTransparent | InputBackgroundSolid | InputBackgroundImage | string,
     scriptText?: string,
     audio?: string,
-
     InputConfig?: string,
     avatarSettings?: {
         /**
@@ -121,6 +120,7 @@ export class Synthesia {
     }
 
     request(method: SynthesiaCreateVideo | SynthesiaGetVideo) {
+        console.log(method);
         if (method instanceof SynthesiaCreateVideo) {
             const data = {
                 ...this.cfg,
