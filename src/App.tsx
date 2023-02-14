@@ -9,6 +9,7 @@ import feelingsVideo from '/santa-feelings.mp4';
 import friendshipsVideo from '/santa-friendships.mp4';
 import moneyVideo from '/santa-money.mp4';
 import loveVideo from '/santa-love.mp4';
+import workVideo from '/santa-work.mp4';
 import noneVideo from '/santa-none.mp4';
 
 const videosDatabase = {
@@ -17,6 +18,7 @@ const videosDatabase = {
   'Money': moneyVideo,
   'Love': loveVideo,
   'None': noneVideo,
+  'Work': workVideo,
 };
 
 function App() {
