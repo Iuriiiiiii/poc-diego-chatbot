@@ -4,12 +4,12 @@ import { Synthesia, SynthesiaCreateVideo, SynthesiaGetVideo, Input, InputConfig,
 import { AxiosResponse } from 'axios';
 import Player from './components/Player';
 import { Configuration, OpenAIApi } from 'openai';
-import baseVideo from '/base.mp4';
-import feelingsVideo from '/feelings.mp4';
-import friendshipsVideo from '/friendships.mp4';
-import moneyVideo from '/money.mp4';
-import loveVideo from '/love.mp4';
-import noneVideo from '/none.mp4';
+import baseVideo from '/santa-main.mp4';
+import feelingsVideo from '/santa-feelings.mp4';
+import friendshipsVideo from '/santa-friendships.mp4';
+import moneyVideo from '/santa-money.mp4';
+import loveVideo from '/santa-love.mp4';
+import noneVideo from '/santa-none.mp4';
 
 const videosDatabase = {
   'Feelings': feelingsVideo,
