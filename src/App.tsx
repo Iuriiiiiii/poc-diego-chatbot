@@ -5,20 +5,15 @@ import { AxiosResponse } from 'axios';
 import Player from './components/Player';
 import { Configuration, OpenAIApi } from 'openai';
 import mainVideo from '/santa-main.mp4';
-import feelingsVideo from '/santa-feelings.mp4';
-import friendshipsVideo from '/santa-friendships.mp4';
-import moneyVideo from '/santa-money.mp4';
-import loveVideo from '/santa-love.mp4';
-import workVideo from '/santa-work.mp4';
+import bodyCare from '/santa-cuidado-del-cuerpo.mp4';
+import lack from '/santa-escasez.mp4';
 import noneVideo from '/santa-none.mp4';
 
 const videosDatabase = {
-  'Feelings': feelingsVideo,
-  'Friendship': friendshipsVideo,
-  'Money': moneyVideo,
-  'Love': loveVideo,
+  'Cuidado personal': bodyCare,
   'None': noneVideo,
-  'Work': workVideo,
+  'Escasez': lack,
+  'Futuro': lack
 };
 
 function App() {
@@ -46,12 +41,19 @@ function App() {
       apiKey: import.meta.env.VITE_OPENAI_SECRET_KEY,
     });
     const openai = new OpenAIApi(configuration);
-    const header = 'Answer in one word or "None". Which of the following strings "Love", "Friendship", "Feelings", "Work", "Money" describes better the following text?:';
+    // const header = 'Answer in one word or "None". Which of the following strings "Love", "Friendship", "Feelings", "Work", "Money" describes better the following text?:';
+    const header = 'Textos: "Cuidado del cuerpo", "Futuro" y "Escasez".\nResponde única y estrictamente con el texto que mejor describa la siguiente sentencia o con "None": ';
+    const prompt = header + text.trim();
+
+    console.log({ prompt });
+    // ¿Qué puedo esperar del futuro?
     const completion = await openai.createCompletion({
-      model: "text-davinci-003",
-      prompt: header + text,
-      temperature: 0.6,
-      max_tokens: 1000
+      model: 'text-davinci-003',
+      prompt,
+      temperature: 0.7,
+      max_tokens: 50,
+      n: 1,
+      stop: '\n'
     });
 
     console.log(completion.data.choices);
@@ -109,7 +111,7 @@ function App() {
     console.time('OpenAI');
     const chatGPTAnswer = (await getOpenaiAnswer(question))!.split(/\s/g).at(-1);
     console.timeEnd('OpenAI');
-    console.log('End question');
+    // console.log('End question');
     inputTextRef.current!.value = '';
     // setMessages([...messages, chatGPTAnswer]);
     // chatContainer.current!.scrollTop = chatContainer.current!.scrollHeight;
@@ -122,7 +124,7 @@ function App() {
 
     // });
 
-    console.log(chatGPTAnswer);
+    console.log('Item:', chatGPTAnswer);
 
     /* @ts-ignore */
     pushVideo(videosDatabase[chatGPTAnswer.replace(/[^0-9a-z]/gi, '')]);
