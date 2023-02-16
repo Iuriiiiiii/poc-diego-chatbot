@@ -2,9 +2,24 @@ import { MouseEventHandler, useEffect, useRef, useState } from 'react';
 import './App.scss';
 import { Synthesia, SynthesiaCreateVideo, SynthesiaGetVideo, Input, InputConfig, SynthesiaVideoResponse } from '../lib/synthesia';
 import { AxiosResponse } from 'axios';
-import mainVideo from '/main.mp4';
 import Player from './components/Player';
 import { Configuration, OpenAIApi } from 'openai';
+import mainVideo from '/santa-main.mp4';
+import feelingsVideo from '/santa-feelings.mp4';
+import friendshipsVideo from '/santa-friendships.mp4';
+import moneyVideo from '/santa-money.mp4';
+import loveVideo from '/santa-love.mp4';
+import workVideo from '/santa-work.mp4';
+import noneVideo from '/santa-none.mp4';
+
+const videosDatabase = {
+  'Feelings': feelingsVideo,
+  'Friendship': friendshipsVideo,
+  'Money': moneyVideo,
+  'Love': loveVideo,
+  'None': noneVideo,
+  'Work': workVideo,
+};
 
 function App() {
   const inputTextRef = useRef<HTMLInputElement>(null);
@@ -31,14 +46,15 @@ function App() {
       apiKey: import.meta.env.VITE_OPENAI_SECRET_KEY,
     });
     const openai = new OpenAIApi(configuration);
-    const header = 'Answer in less of 800 characters and without code examples: ';
-
+    const header = 'Answer in one word or "None". Which of the following strings "Love", "Friendship", "Feelings", "Work", "Money" describes better the following text?:';
     const completion = await openai.createCompletion({
       model: "text-davinci-003",
       prompt: header + text,
       temperature: 0.6,
       max_tokens: 1000
     });
+
+    console.log(completion.data.choices);
 
     return completion.data.choices[0].text;
   }
@@ -91,26 +107,29 @@ function App() {
 
     console.log('Question:', question);
     console.time('OpenAI');
-    const chatGPTAnswer = (await getOpenaiAnswer(question))!;
+    const chatGPTAnswer = (await getOpenaiAnswer(question))!.split(/\s/g).at(-1);
     console.timeEnd('OpenAI');
     console.log('End question');
     inputTextRef.current!.value = '';
     // setMessages([...messages, chatGPTAnswer]);
     // chatContainer.current!.scrollTop = chatContainer.current!.scrollHeight;
 
+    // getSynthesiaVideo(chatGPTAnswer, (response) => {
+    //   setMessages([...messages, chatGPTAnswer]);
+    //   pushVideo(response.download!);
+    //   // console.log(response.download);
+    //   console.timeEnd("Synthesia");
+
+    // });
+
     console.log(chatGPTAnswer);
 
-    console.time("Synthesia");
-    getSynthesiaVideo(chatGPTAnswer, (response) => {
-      setMessages([...messages, chatGPTAnswer]);
-      setVideos([...videos, response.download!]);
-      console.log(response.download);
-      console.timeEnd("Synthesia");
-    });
-    // pushVideo('https://synthesia-ttv-data.s3.amazonaws.com/video_data/ac551166-72c8-462d-a062-8faab059bc36/transfers/target_transfer.mp4?response-content-disposition=attachment%3Bfilename%3D%22Synthesia%20video%20-%20ac5511.mp4%22&AWSAccessKeyId=ASIA32NGJ5TS6MSQ7ADN&Signature=D54KVOa%2FEgoAQ1u4rIal%2BR0J2zw%3D&x-amz-security-token=IQoJb3JpZ2luX2VjEFIaCWV1LXdlc3QtMSJHMEUCIQDIBCPCWiP8dIsOhlZOom7rk4xAgjhhOD1a6pZtI0E4zwIgDDKSMYMGssgE3i17ZE%2Bh28qO03u8hqN1DDXdSGkVw2oqlgMI2%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FARACGgw4MTI2MzQ0Njc1NTciDFk69B5UzrdpaAXqPCrqAgOlAFP2anOk%2FaqwpFCSLZ70NcuEzfY08Uh1ajrknyKhD43gGoKSIduJlZRJpJjLSDXji6xbU9fYbBgtRV%2BKq%2Bq1UjqrE70yI8FRHsX8fpp25wXV6j2MRUp90HtUpxiwXCtGOKXkQlUAXGo4de1zPRlYVuLowLL0wPxoGtCuh3fvYJEcqlyBaAy%2FZhrMvDBu28vFUBtgEpWDHfUDFG%2FaEceAOXr6591XxQowe5QyMdqAxvojk3a0Rqu7OKIjcCxMoR9rc6umPJ2UHD6HPspCctYju5hkbAjvvFpIVWPu1t9yERyLTi%2BmdA%2BmKM4WlvNwWx9omemVdDwIfv47nXohxOOkf7RcZ1Hyc8B8HEel257WXjWdjobYQsR5p8BgiMmAHAf0WiL3Ofu3qHP3QSY%2BG81OpXKIF9jR61KQ4j6m%2FOaw3hjocoX8si3AOiZsjBBWZhzen9rWi5NT7VHGYXelbNjMSixn%2BWMm%2FsfZMJHOpJ8GOp0BaqfXFDGSzrd1vH3sZvSUVCbFZJkden7ggK9U1zeFtmQnRuDhY69SCbiGDuhsXQcjDokZFjTVhEOTwOt58879Y1tX3IcQoX1mdnCleQUNWUgIJ%2B1%2Fr0p9lT4%2BajFn00MfVGLhiNYuXF6YrFZEmW4%2Bu5XLMTLd0qxUa87Kk%2FIU7VpCf7eChVOxi0LkIAYMAaiqN9OgN87hTSr1dcfdiQ%3D%3D&Expires=1676246085');
+    /* @ts-ignore */
+    pushVideo(videosDatabase[chatGPTAnswer.replace(/[^0-9a-z]/gi, '')]);
   }
 
   function pushVideo(url: string) {
+    console.log(url);
     setVideos([...videos, url]);
   }
 
@@ -140,8 +159,8 @@ function App() {
         <div ref={chatContainer} className='flex flex-col space-y-2 h-32 w-full text-white bg-pink-800 overflow-y-scroll p-3'>
           {messages.map((message, index) => <span key={`${message}${index}`}>{message}</span>)}
         </div>
-        <input ref={inputTextRef} type='text' className='bg-pink-800 px-3 text-white' placeholder='Your question here!' maxLength={200} />
-        <button onClick={clickHandler} type='button' className='bg-pink-800 text-white w-full'>Send</button>
+        <input ref={inputTextRef} type='text' className='bg-pink-300 px-3 text-black' placeholder='Your question here!' maxLength={1000} />
+        <button onClick={clickHandler} type='button' className='bg-pink-300 text-black w-full'>Send</button>
       </div>
     </div>
   );
