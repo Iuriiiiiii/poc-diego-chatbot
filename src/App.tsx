@@ -93,6 +93,7 @@ function App() {
 
     writeMessage(UserType.user, question);
     inputRef.current!.value = '';
+    setSendBtnDisabled(true);
 
     if (debug()) {
       console.log('OpenAI text:', chatGPTAnswer);
