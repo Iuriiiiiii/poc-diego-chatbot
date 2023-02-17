@@ -1,9 +1,22 @@
 #root {
-    @apply flex justify-center items-center w-screen h-screen bg-slate-200;
+    @apply flex justify-center items-center w-screen h-screen relative z-0;
+    background-image: url("./assets/background01.jpg");
+    background-size: cover;
+    background-position: right top;
+}
+
+#root::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    width: 100%;
 }
 
 .app-main {
-   @apply flex shadow-xl w-3/5 h-3/5;
+   @apply flex shadow-xl w-3/5 h-3/5 z-10;
 }
 
 .avatar {
@@ -38,17 +51,25 @@
 }
 
 .chat-placeholder {
-    @apply flex flex-col bg-slate-100 scroll-auto p-3 h-full w-full mb-14;
+    @apply flex flex-col bg-slate-100 scroll-auto p-3 h-full w-full mb-14 overflow-y-auto;
 }
 
 .chat-placeholder-bubble {
-    @apply w-fit rounded-xl bg-blue-600 text-white text-sm px-2 py-1;
+    @apply rounded-xl text-sm px-2 py-1;
+    max-width: 80%;
 }
 
-.chat-placeholder-bubble:not(:first-child):not(:last-child)    {
-    @apply my-1;
+.chat-placeholder-bubble:not(:first-child)    {
+    @apply mt-2;
 }
 
+.chat-placeholder-bubble.bot {
+    @apply bg-gray-200;
+}
+
+.chat-placeholder-bubble.user {
+    @apply bg-blue-500 self-end text-white;
+}
 
 .chat-actions {
     @apply  flex absolute bottom-0 w-full h-14;
@@ -67,6 +88,11 @@
     @apply  inline-flex w-12 items-center justify-center;
 }
 
-.chat-actions-send > img {
-    @apply  w-5 h-5 items-center;
+.chat-actions-send > svg {
+    @apply w-5 h-5 items-center text-gray-600;
+    fill: currentColor;
+}
+
+.chat-actions-send:disabled > svg {
+    @apply text-gray-400;
 }
