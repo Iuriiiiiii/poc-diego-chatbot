@@ -57,8 +57,8 @@ export async function getOpenaiAnswer(text: string) {
     const openai = new OpenAIApi(configuration);
     // const header = 'Answer in one word or "None". Which of the following strings "Love", "Friendship", "Feelings", "Work", "Money" describes better the following text?:';
     const header = `
-Textos: "Cuidado del cuerpo", "Esperar del futuro", "Futuro", "Extrañar a alguien" y "Escasez".
-Responde únicamente con uno de los textos que mejor describa la siguiente sentencia, si nunguna de ellas encaja, response con "None".:
+Textos: "Cuidado del cuerpo", "Esperar del futuro", "Futuro", "Extrañar a alguien", "Carencia", "Falta" y "Escasez".
+Responde únicamente con uno de los textos que se acerque a lo que se refiere la siguiente sentencia, si nunguna de ellas encaja, response con "None".:
 `.trim();
     const prompt = header + ' ' + text.trim();
 

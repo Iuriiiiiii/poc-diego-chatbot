@@ -20,6 +20,8 @@ const videosDatabase = {
   'None': noneVideo,
   'Escasez': lack,
   'Futuro': lack,
+  'Esperar del futuro': lack,
+  'Falta': lack,
   'Extrañar a alguien': missVideo
 };
 
@@ -79,7 +81,7 @@ function App() {
 
     const chatGPTAnswer = ((await getOpenaiAnswer(question))!.split('\n\n')[1] || '').trim().replace('"', '');
 
-    // return writeMessage(UserType.bot, question);
+    return writeMessage(UserType.bot, question);
 
     if (debug()) {
       console.timeEnd('OpenAI');
