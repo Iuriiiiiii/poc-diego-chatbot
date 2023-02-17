@@ -79,6 +79,8 @@ function App() {
 
     const chatGPTAnswer = ((await getOpenaiAnswer(question))!.split('\n\n')[1] || '').trim().replace('"', '');
 
+    // return writeMessage(UserType.bot, question);
+
     if (debug()) {
       console.timeEnd('OpenAI');
     }
