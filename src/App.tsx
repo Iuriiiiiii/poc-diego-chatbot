@@ -1,27 +1,51 @@
-import { MouseEventHandler, useEffect, useRef, useState } from 'react';
+import React, { MouseEventHandler, useEffect, useRef, useState } from 'react';
 import './App.scss';
 import { Synthesia, SynthesiaCreateVideo, SynthesiaGetVideo, Input, InputConfig, SynthesiaVideoResponse } from '../lib/synthesia';
-import { AxiosResponse } from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import Player from './components/Player';
 import { Configuration, OpenAIApi } from 'openai';
 import mainVideo from '/santa-main.mp4';
 import bodyCare from '/santa-cuidado-del-cuerpo.mp4';
 import lack from '/santa-escasez.mp4';
-import noneVideo from '/santa-none.mp4';
+import noneVideo from '/santa-no-sé.mp4';
+import missVideo from '/santa-extrañas-a-alguien.mp4';
+import { debug, getOpenaiAnswer } from './utils';
+import bodyCareSubtitle from '/subtitles/santa-cuidado-del-cuerpo.txt';
+import noneVideoSubtitle from '/subtitles/santa-no-sé.txt';
+import lackSubtitle from '/subtitles/santa-escasez.txt';
+import missVideoSubtitle from '/subtitles/santa-extrañas-a-alguien.txt';
 import sendSvg from './assets/send.svg';
 
 const videosDatabase = {
   'Cuidado personal': bodyCare,
   'None': noneVideo,
   'Escasez': lack,
-  'Futuro': lack
+  'Futuro': lack,
+  'Extrañar a alguien': missVideo
 };
 
+const subtitlesDatabase = {
+  [bodyCare]: bodyCareSubtitle,
+  [noneVideo]: noneVideoSubtitle,
+  [lack]: lackSubtitle,
+  [missVideo]: missVideoSubtitle
+};
+
+const enum UserType {
+  bot,
+  user
+}
+
+interface MessageType {
+  userType: UserType,
+  message: string;
+}
+
 function App() {
-  const inputTextRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const chatContainer = useRef<HTMLDivElement>(null);
-  const videoContainer = useRef<HTMLVideoElement>(null);
-  const [messages, setMessages] = useState<string[]>([]);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [messages, setMessages] = useState<MessageType[]>([]);
   /* filo stack */
   const [videos, setVideos] = useState<string[]>([]);
 
@@ -30,113 +54,75 @@ function App() {
   // }, [messages.length]);
 
   useEffect(() => {
-    if (videoContainer.current) {
-      videoContainer.current.play();
+    if (videoRef.current) {
+      videoRef.current.play();
     }
 
-    console.log('Video: ', videos.at(0) || mainVideo);
+    if (debug()) {
+      console.log('Video: ', videos.at(0) || mainVideo);
+    }
   }, [videos.length]);
 
-  async function getOpenaiAnswer(text: string) {
-    const configuration = new Configuration({
-      apiKey: import.meta.env.VITE_OPENAI_SECRET_KEY,
-    });
-    const openai = new OpenAIApi(configuration);
-    // const header = 'Answer in one word or "None". Which of the following strings "Love", "Friendship", "Feelings", "Work", "Money" describes better the following text?:';
-    const header = 'Textos: "Cuidado del cuerpo", "Futuro" y "Escasez".\nResponde única y estrictamente con el texto que mejor describa la siguiente sentencia o con "None": ';
-    const prompt = header + text.trim();
-
-    console.log({ prompt });
-    // ¿Qué puedo esperar del futuro?
-    const completion = await openai.createCompletion({
-      model: 'text-davinci-003',
-      prompt,
-      temperature: 0.7,
-      max_tokens: 50,
-      n: 1,
-      stop: '\n'
-    });
-
-    console.log(completion.data.choices);
-
-    return completion.data.choices[0].text;
-  }
-
-  async function getSynthesiaVideo(text: string, notify: (response: SynthesiaVideoResponse) => void) {
-    const synth = new Synthesia({
-      token: import.meta.env.VITE_SYNTHESIA_TOKEN,
-      test: import.meta.env.VITE_SYNTHESIA_TEST_MODE
-    });
-
-    console.time('Synthesia create video request');
-    console.log('createVideo');
-    const createVideo = await synth.request(new SynthesiaCreateVideo([
-      new Input({
-        scriptText: text,
-        avatar: import.meta.env.VITE_SYNTHESIA_AVATAR,
-      })
-    ]));
-    console.timeEnd('Synthesia create video request');
-    console.log('end createVideo');
-
-    if (createVideo.status === 201) {
-      const interval = setInterval(async () => {
-        console.time('Synthesia get video request');
-        const getVideo = await synth.request(new SynthesiaGetVideo(createVideo.data.id));
-        console.timeEnd('Synthesia get video request');
-
-
-        console.log({ status: getVideo.data.status });
-
-        if (getVideo.status > 205 || getVideo.data.status === 'complete') {
-          notify(getVideo.data);
-          return clearInterval(interval);
-        }
-      }, 10000);
-    }
-
-  }
-
-  async function clickHandler(e: React.MouseEvent<HTMLButtonElement>) {
-    if (!inputTextRef) {
+  async function onButtonClick(e: React.MouseEvent<HTMLButtonElement>) {
+    if (!inputRef) {
       return;
     }
 
-    const question = inputTextRef.current!.value;
+    const question = inputRef.current!.value;
 
     if (question === '') {
       return;
     }
 
-    console.log('Question:', question);
-    console.time('OpenAI');
-    const chatGPTAnswer = (await getOpenaiAnswer(question))!.split(/\s/g).at(-1);
-    console.timeEnd('OpenAI');
-    // console.log('End question');
-    inputTextRef.current!.value = '';
-    setMessages([...messages, chatGPTAnswer]);
-    // chatContainer.current!.scrollTop = chatContainer.current!.scrollHeight;
+    if (debug()) {
+      console.time('OpenAI');
+    }
 
-    // getSynthesiaVideo(chatGPTAnswer, (response) => {
-    //   setMessages([...messages, chatGPTAnswer]);
-    //   pushVideo(response.download!);
-    //   // console.log(response.download);
-    //   console.timeEnd("Synthesia");
+    const chatGPTAnswer = ((await getOpenaiAnswer(question))!.split('\n\n')[1] || '').trim().replace('"', '');
 
-    // });
+    // return writeMessage(UserType.bot, question);
 
-    console.log('Item:', chatGPTAnswer);
+    if (debug()) {
+      console.timeEnd('OpenAI');
+    }
 
+    writeMessage(UserType.user, question);
+    inputRef.current!.value = '';
+
+    if (debug()) {
+      console.log('OpenAI text:', chatGPTAnswer);
+    }
     /* @ts-ignore */
-    pushVideo(videosDatabase[chatGPTAnswer.replace(/[^0-9a-z]/gi, '')]);
+    setVideos([...videos, videosDatabase[chatGPTAnswer]]);
   }
 
-  function pushVideo(url: string) {
-    console.log(url);
-    setVideos([...videos, url]);
+  function writeMessage(userType: UserType, message: string) {
+    setMessages([...messages, { userType, message }]);
   }
 
-  function nextVideo() {
+  function getMedia() {
+    return videos[0] || mainVideo;
+  }
+
+  function onVideoClick(e: React.MouseEvent<HTMLVideoElement>) {
+    const current = e.currentTarget;
+
+    if (current.paused) {
+      return current.play();
+    }
+
+    current.pause();
+  }
+
+  async function onVideoPlay(e: React.SyntheticEvent<HTMLVideoElement>) {
+    try {
+      /* @ts-ignore */
+      const content = (await axios.get<string>(subtitlesDatabase[getMedia()])).data;
+      writeMessage(UserType.bot, content);
+    } catch (e) { }
+  }
+
+  function getNextVideo() {
     if (videos.length === 0) {
       return;
     }
@@ -145,36 +131,15 @@ function App() {
     setVideos([...videos]);
   }
 
-  function playVideo() {
-    if (videoContainer.current) {
-      videoContainer.current.play();
-    }
-  }
-
-  function onVideoEnd() {
-    nextVideo();
-  }
-
   return (
-    <div className='app-main'>
-      <Player cref={videoContainer} onClick={playVideo} className='avatar' src={videos.at(0) || mainVideo} onEnded={onVideoEnd} autoPlay />
-      <div className='chat-container'>
-        <div className="chat-header">
-          <div className="chat-header-avatar">
-            J
-          </div>
-          <div className="chat-header-info">
-            <h3 className="chat-header-info-title">Jhon Doe</h3>
-            <p className="chat-header-info-content">last seen 2h ago</p>
-          </div>
+    <div className='flex justify-center items-center w-screen h-screen bg-[#E1B6B6]'>
+      <Player cref={videoRef} onClick={onVideoClick} onPlay={onVideoPlay} className='w-full h-screen' src={getMedia()} onEnded={getNextVideo} autoPlay />
+      <div className='flex flex-col space-y-2 w-4/6 absolute bottom-2 drop-shadow-2xl opacity-80'>
+        <div ref={chatContainer} className='flex flex-col space-y-2 h-32 w-full text-white bg-pink-800 overflow-y-scroll p-3'>
+          {messages.map((message, index) => <span key={`${message}${index}`}>{message.message}</span>)}
         </div>
-        <div ref={chatContainer} className='chat-placeholder'>
-          {messages.map((message, index) => <div className='chat-placeholder-bubble' key={`${message}${index}`}>{message}</div>)}
-        </div>
-        <div className="chat-actions">
-          <input ref={inputTextRef} type='text' className='chat-actions-input' placeholder='Your question here!' maxLength={1000} />
-          <button onClick={clickHandler} type='button' className='chat-actions-send'><img src={sendSvg} alt="send" /></button>
-        </div>
+        <input ref={inputRef} type='text' className='bg-pink-300 px-3 text-black' placeholder='Your question here!' maxLength={1000} />
+        <button onClick={onButtonClick} type='button' className='bg-pink-300 text-black w-full'>Send</button>
       </div>
     </div>
   );
