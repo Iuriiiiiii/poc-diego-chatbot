@@ -132,14 +132,25 @@ function App() {
   }
 
   return (
-    <div className='flex justify-center items-center w-screen h-screen bg-[#E1B6B6]'>
-      <Player cref={videoRef} onClick={onVideoClick} onPlay={onVideoPlay} className='w-full h-screen' src={getMedia()} onEnded={getNextVideo} autoPlay />
-      <div className='flex flex-col space-y-2 w-4/6 absolute bottom-2 drop-shadow-2xl opacity-80'>
-        <div ref={chatContainer} className='flex flex-col space-y-2 h-32 w-full text-white bg-pink-800 overflow-y-scroll p-3'>
-          {messages.map((message, index) => <span key={`${message}${index}`}>{message.message}</span>)}
+    <div className='app-main'>
+      <Player cref={videoRef} onClick={onVideoClick} onPlay={onVideoPlay} className='avatar' src={getMedia()} onEnded={getNextVideo} autoPlay />
+      <div className='chat-container'>
+        <div className="chat-header">
+          <div className="chat-header-avatar">
+            J
+          </div>
+          <div className="chat-header-info">
+            <h3 className="chat-header-info-title">Jhon Doe</h3>
+            <p className="chat-header-info-content">last seen 2h ago</p>
+          </div>
         </div>
-        <input ref={inputRef} type='text' className='bg-pink-300 px-3 text-black' placeholder='Your question here!' maxLength={1000} />
-        <button onClick={onButtonClick} type='button' className='bg-pink-300 text-black w-full'>Send</button>
+        <div ref={chatContainer} className='chat-placeholder'>
+          {messages.map((message, index) => <div className='chat-placeholder-bubble' key={`${message}${index}`}>{message.message}</div>)}
+        </div>
+        <div className="chat-actions">
+          <input ref={inputRef} type='text' className='chat-actions-input' placeholder='Your question here!' maxLength={1000} />
+          <button onClick={onButtonClick} type='button' className='chat-actions-send'><img src={sendSvg} alt="send" /></button>
+        </div>
       </div>
     </div>
   );
