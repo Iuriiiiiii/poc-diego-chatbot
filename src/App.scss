@@ -1,0 +1,72 @@
+#root {
+    @apply flex justify-center items-center w-screen h-screen bg-slate-200;
+}
+
+.app-main {
+   @apply flex shadow-xl w-3/5 h-3/5;
+}
+
+.avatar {
+    @apply w-3/5;
+    object-fit: cover;
+    object-position: center;
+}
+
+.chat-container {
+    @apply flex flex-col flex-grow relative bg-white;
+}
+
+.chat-header {
+    @apply flex items-center px-4;
+    height: 5rem
+}
+
+.chat-header-avatar {
+    @apply inline-flex h-8 w-8 rounded-full ring-2 ring-stone-600 justify-center items-center bg-slate-400;
+}
+
+.chat-header-info {
+    @apply ml-4 text-gray-500;
+}
+
+.chat-header-info-title {
+    @apply font-semibold text-lg;
+}
+
+.chat-header-info-content {
+    @apply font-thin text-sm leading-4;
+}
+
+.chat-placeholder {
+    @apply flex flex-col bg-slate-100 scroll-auto p-3 h-full w-full mb-14;
+}
+
+.chat-placeholder-bubble {
+    @apply w-fit rounded-xl bg-blue-600 text-white text-sm px-2 py-1;
+}
+
+.chat-placeholder-bubble:not(:first-child):not(:last-child)    {
+    @apply my-1;
+}
+
+
+.chat-actions {
+    @apply  flex absolute bottom-0 w-full h-14;
+    border-top: 1px solid #e2e8f0;
+}
+
+.chat-actions-input {
+    @apply  flex-grow px-2;
+}
+
+.chat-actions-input:focus {
+    outline: none;
+}
+
+.chat-actions-send {
+    @apply  inline-flex w-12 items-center justify-center;
+}
+
+.chat-actions-send > img {
+    @apply  w-5 h-5 items-center;
+}

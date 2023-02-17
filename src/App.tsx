@@ -8,6 +8,7 @@ import mainVideo from '/santa-main.mp4';
 import bodyCare from '/santa-cuidado-del-cuerpo.mp4';
 import lack from '/santa-escasez.mp4';
 import noneVideo from '/santa-none.mp4';
+import sendSvg from './assets/send.svg';
 
 const videosDatabase = {
   'Cuidado personal': bodyCare,
@@ -24,9 +25,9 @@ function App() {
   /* filo stack */
   const [videos, setVideos] = useState<string[]>([]);
 
-  useEffect(() => {
-    chatContainer.current!.scrollTo({ top: Number.MAX_SAFE_INTEGER });
-  }, [messages.length]);
+  // useEffect(() => {
+  //   chatContainer.current!.scrollTo({ top: Number.MAX_SAFE_INTEGER });
+  // }, [messages.length]);
 
   useEffect(() => {
     if (videoContainer.current) {
@@ -113,7 +114,7 @@ function App() {
     console.timeEnd('OpenAI');
     // console.log('End question');
     inputTextRef.current!.value = '';
-    // setMessages([...messages, chatGPTAnswer]);
+    setMessages([...messages, chatGPTAnswer]);
     // chatContainer.current!.scrollTop = chatContainer.current!.scrollHeight;
 
     // getSynthesiaVideo(chatGPTAnswer, (response) => {
@@ -155,14 +156,25 @@ function App() {
   }
 
   return (
-    <div className='flex justify-center items-center w-screen h-screen bg-[#E1B6B6]'>
-      <Player cref={videoContainer} onClick={playVideo} className='w-full h-screen' src={videos.at(0) || mainVideo} onEnded={onVideoEnd} autoPlay />
-      <div className='flex flex-col space-y-2 w-4/6 absolute bottom-2 drop-shadow-2xl opacity-80'>
-        <div ref={chatContainer} className='flex flex-col space-y-2 h-32 w-full text-white bg-pink-800 overflow-y-scroll p-3'>
-          {messages.map((message, index) => <span key={`${message}${index}`}>{message}</span>)}
+    <div className='app-main'>
+      <Player cref={videoContainer} onClick={playVideo} className='avatar' src={videos.at(0) || mainVideo} onEnded={onVideoEnd} autoPlay />
+      <div className='chat-container'>
+        <div className="chat-header">
+          <div className="chat-header-avatar">
+            J
+          </div>
+          <div className="chat-header-info">
+            <h3 className="chat-header-info-title">Jhon Doe</h3>
+            <p className="chat-header-info-content">last seen 2h ago</p>
+          </div>
         </div>
-        <input ref={inputTextRef} type='text' className='bg-pink-300 px-3 text-black' placeholder='Your question here!' maxLength={1000} />
-        <button onClick={clickHandler} type='button' className='bg-pink-300 text-black w-full'>Send</button>
+        <div ref={chatContainer} className='chat-placeholder'>
+          {messages.map((message, index) => <div className='chat-placeholder-bubble' key={`${message}${index}`}>{message}</div>)}
+        </div>
+        <div className="chat-actions">
+          <input ref={inputTextRef} type='text' className='chat-actions-input' placeholder='Your question here!' maxLength={1000} />
+          <button onClick={clickHandler} type='button' className='chat-actions-send'><img src={sendSvg} alt="send" /></button>
+        </div>
       </div>
     </div>
   );
