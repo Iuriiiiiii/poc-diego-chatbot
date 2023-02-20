@@ -16,8 +16,16 @@ import lackSubtitle from '/subtitles/santa-escasez.txt';
 import missVideoSubtitle from '/subtitles/santa-extrañas-a-alguien.txt';
 import SendSVG from './components/common/SendSVG';
 
+/* 
+1 - ¿Cómo puedo cuidar mi cuerpo?
+2 - Hacen falta cosas en mi vida. ¿Cómo puedo solventarlo?
+3 - Cómo puedo conseguir más dinero?
+4 - Extraño mucho a mi Ex, quiero recuperarla.
+*/
+
 const videosDatabase = {
   'Cuidado personal': bodyCare,
+  'Cuidado del cuerpo': bodyCare,
   'None': noneVideo,
   'Escasez': lack,
   'Futuro': lack,
@@ -87,7 +95,7 @@ function App() {
 
     const chatGPTAnswer = ((await getOpenaiAnswer(question))!.split('\n\n')[1] || '').trim().replace('"', '');
 
-    return writeMessage(UserType.bot, question);
+    // return writeMessage(UserType.bot, question);
 
     if (debug()) {
       console.timeEnd('OpenAI');
@@ -126,6 +134,11 @@ function App() {
     try {
       /* @ts-ignore */
       const content = (await axios.get<string>(subtitlesDatabase[getMedia()])).data;
+
+      if (messages.at(-1)!.message === content) {
+        return;
+      }
+
       writeMessage(UserType.bot, content);
     } catch (e) { }
   }
@@ -158,7 +171,7 @@ function App() {
               <div className={`chat-placeholder-bubble ${message.userType === UserType.bot ? "bot" : "user"}`} key={`${message}${index}`}>
                 {message.message}
               </div>
-            )
+            );
           })}
         </div>
         <div className="chat-actions">
