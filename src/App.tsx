@@ -74,6 +74,10 @@ function App() {
     }
   }, [videos.length]);
 
+  useEffect(() => {
+    console.log(import.meta.env);
+  }, []);
+
   async function onButtonClick(e: React.MouseEvent<HTMLButtonElement> | React.KeyboardEvent<HTMLInputElement>) {
     if (e.type === "keydown" && (e as React.KeyboardEvent<HTMLInputElement>).code !== "Enter") {
       return;
