@@ -75,7 +75,7 @@ Analiza las siguientes condiciones y devuelve únicamente el valor de la variabl
 "Texto" habla sobre obtener más dinero, ganar más dinero, anhelar más dinero o desear más dinero. Resultado: Ganar dinero.
 "Texto" habla extrañar a otras personas, querer ver o estar cerca de personas. Resultado: Extrañar a alguien.
 "Texto" habla sobre cuidado personal, mejora del cuerpo, salud, ejercicios o cuidado del cuerpo. Resultado: Cuidado del cuerpo.
-"Texto" habla sobre escasez, falta de algo material o deseo de conseguir algo material diferente al dinero. Resultado: Escasez.
+"Texto" habla sobre escasez, falta de algo material, esperar conseguir algo en el futuro o deseo de conseguir algo material diferente al dinero. Resultado: Escasez.
 "Texto" habla sobre la confianza en uno mismo o la carencia de esta. Resultado: Confianza en uno mismo.
 "Texto" habla sobre el futuro, planes futuros o deseos para el futuro. Resultado: Futuro.
 "Texto" habla sobre el cuidado de los hijos, el comportamiento de los hijos, la actitud de los hijos, ayudar a los hijos, mejorar el comportamiento de los hijos o criar a los hijos. Resultado: Ayudar hijos.
