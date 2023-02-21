@@ -1,98 +1,96 @@
 #root {
-    @apply flex justify-center items-center w-screen h-screen relative z-0;
-    background-image: url("./assets/background01.jpg");
-    background-size: cover;
-    background-position: right top;
+  @apply flex justify-center items-center w-screen h-screen relative z-0;
 }
 
 #root::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
-    width: 100%;
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  width: 100%;
 }
 
 .app-main {
-   @apply flex shadow-xl w-screen h-screen z-10;
+  @apply flex shadow-xl w-screen h-screen z-10;
 }
 
 .avatar {
-    @apply w-8/12;
-    object-fit: cover;
-    object-position: center;
+  @apply w-full object-cover object-center lg:w-8/12;
 }
 
 .chat-container {
-    @apply flex flex-col flex-grow relative bg-white;
+  @apply flex flex-col flex-grow bg-white absolute bottom-6 h-1/3 w-4/5 lg:relative lg:h-full lg:bottom-0;
+  @screen lg {
+    margin-left: 0;
+  }
+  margin-left: 10%;
 }
 
 .chat-header {
-    @apply flex items-center px-4;
-    height: 5rem
+  @apply flex items-center px-4 h-24 lg:h-20;
 }
 
 .chat-header-avatar {
-    @apply inline-flex h-8 w-8 rounded-full ring-2 ring-stone-600 justify-center items-center bg-slate-400;
+  @apply inline-flex h-8 w-8 rounded-full ring-2 ring-stone-600 justify-center items-center bg-slate-400;
 }
 
 .chat-header-info {
-    @apply ml-4 text-gray-500;
+  @apply ml-4 text-gray-500;
 }
 
 .chat-header-info-title {
-    @apply font-semibold text-lg;
+  @apply font-semibold lg:text-lg;
 }
 
 .chat-header-info-content {
-    @apply font-thin text-sm leading-4;
+  @apply font-thin text-xs lg:text-sm leading-4;
 }
 
 .chat-placeholder {
-    @apply flex flex-col bg-slate-100 scroll-auto p-3 h-full w-full mb-14 overflow-y-auto;
+  @apply flex flex-col bg-slate-100 scroll-auto p-3 h-full w-full mb-14 overflow-y-auto;
 }
 
 .chat-placeholder-bubble {
-    @apply rounded-xl text-sm px-2 py-1;
-    max-width: 80%;
+  @apply rounded-xl text-sm px-2 py-1;
+  max-width: 80%;
 }
 
-.chat-placeholder-bubble:not(:first-child)    {
-    @apply mt-2;
+.chat-placeholder-bubble:not(:first-child) {
+  @apply mt-2;
 }
 
 .chat-placeholder-bubble.bot {
-    @apply bg-gray-200;
+  @apply bg-gray-200;
 }
 
 .chat-placeholder-bubble.user {
-    @apply bg-blue-500 self-end text-white;
+  @apply bg-blue-500 self-end text-white;
 }
 
 .chat-actions {
-    @apply  flex absolute bottom-0 w-full h-14;
-    border-top: 1px solid #e2e8f0;
+  @apply flex absolute bottom-0 w-full h-14;
+  border-top: 1px solid #e2e8f0;
 }
 
 .chat-actions-input {
-    @apply  flex-grow px-2;
+  @apply flex-grow px-2;
 }
 
 .chat-actions-input:focus {
-    outline: none;
+  outline: none;
 }
 
 .chat-actions-send {
-    @apply  inline-flex w-12 items-center justify-center;
+  @apply inline-flex w-12 items-center justify-center;
 }
 
 .chat-actions-send > svg {
-    @apply w-5 h-5 items-center text-gray-600;
-    fill: currentColor;
+  @apply w-5 h-5 items-center text-gray-600;
+  fill: currentColor;
 }
 
 .chat-actions-send:disabled > svg {
-    @apply text-gray-400;
+  @apply text-gray-400;
 }
