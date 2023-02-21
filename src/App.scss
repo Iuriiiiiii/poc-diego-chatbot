@@ -16,11 +16,11 @@
 }
 
 .app-main {
-   @apply flex shadow-xl w-3/5 h-3/5 z-10;
+   @apply flex shadow-xl w-screen h-screen z-10;
 }
 
 .avatar {
-    @apply w-3/5;
+    @apply w-8/12;
     object-fit: cover;
     object-position: center;
 }

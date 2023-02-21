@@ -1,19 +1,7 @@
-import React, { MouseEventHandler, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './App.scss';
-import { Synthesia, SynthesiaCreateVideo, SynthesiaGetVideo, Input, InputConfig, SynthesiaVideoResponse } from '../lib/synthesia';
-import axios, { AxiosResponse } from 'axios';
 import Player from './components/Player';
-import { Configuration, OpenAIApi } from 'openai';
-import mainVideo from '/santa-main.mp4';
-import bodyCare from '/santa-cuidado-del-cuerpo.mp4';
-import lack from '/santa-escasez.mp4';
-import noneVideo from '/santa-no-sé.mp4';
-import missVideo from '/santa-extrañas-a-alguien.mp4';
-import { debug, getOpenaiAnswer } from './utils';
-import bodyCareSubtitle from '/subtitles/santa-cuidado-del-cuerpo.txt';
-import noneVideoSubtitle from '/subtitles/santa-no-sé.txt';
-import lackSubtitle from '/subtitles/santa-escasez.txt';
-import missVideoSubtitle from '/subtitles/santa-extrañas-a-alguien.txt';
+import { debug, getAnswerByTopic, getAnswerTextByVideo, getMainVideoSrc, getOpenaiAnswer, IVideo } from './utils';
 import SendSVG from './components/common/SendSVG';
 
 /* 
@@ -22,24 +10,6 @@ import SendSVG from './components/common/SendSVG';
 3 - Cómo puedo conseguir más dinero?
 4 - Extraño mucho a mi Ex, quiero recuperarla.
 */
-
-const videosDatabase = {
-  'Cuidado personal': bodyCare,
-  'Cuidado del cuerpo': bodyCare,
-  'None': noneVideo,
-  'Escasez': lack,
-  'Futuro': lack,
-  'Esperar del futuro': lack,
-  'Falta': lack,
-  'Extrañar a alguien': missVideo
-};
-
-const subtitlesDatabase = {
-  [bodyCare]: bodyCareSubtitle,
-  [noneVideo]: noneVideoSubtitle,
-  [lack]: lackSubtitle,
-  [missVideo]: missVideoSubtitle
-};
 
 const enum UserType {
   bot,
@@ -57,7 +27,7 @@ function App() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [messages, setMessages] = useState<MessageType[]>([]);
   /* filo stack */
-  const [videos, setVideos] = useState<string[]>([]);
+  const [videos, setVideos] = useState<IVideo[]>([]);
   const [sendBtnDisabled, setSendBtnDisabled] = useState(true);
 
   useEffect(() => {
@@ -70,12 +40,12 @@ function App() {
     }
 
     if (debug()) {
-      console.log('Video: ', videos.at(0) || mainVideo);
+      console.log('Video: ', videos.at(-1)?.src || getMainVideoSrc());
     }
   }, [videos.length]);
 
   async function onButtonClick(e: React.MouseEvent<HTMLButtonElement> | React.KeyboardEvent<HTMLInputElement>) {
-    if (e.type === "keydown" && (e as React.KeyboardEvent<HTMLInputElement>).code !== "Enter") {
+    if (e.type === 'keydown' && (e as React.KeyboardEvent<HTMLInputElement>).code !== 'Enter') {
       return;
     }
 
@@ -93,7 +63,12 @@ function App() {
       console.time('OpenAI');
     }
 
-    const chatGPTAnswer = ((await getOpenaiAnswer(question))!.split('\n\n')[1] || '').trim().replace('"', '');
+    // const topicByChatGPT = ((await getOpenaiAnswer(question))!.split('\n\n')[1] || '').trim().replace(''', '');
+    const topicByChatGPT = (await getOpenaiAnswer(question))!
+      .split('\n\n')[1]
+      .trim()
+      .replace('Resultado: ', '')
+      .replace('.', '');
 
     // return writeMessage(UserType.bot, question);
 
@@ -106,18 +81,19 @@ function App() {
     setSendBtnDisabled(true);
 
     if (debug()) {
-      console.log('OpenAI text:', chatGPTAnswer);
+      console.log('OpenAI text:', topicByChatGPT);
     }
+
     /* @ts-ignore */
-    setVideos([...videos, videosDatabase[chatGPTAnswer]]);
+    setVideos([...videos, getAnswerByTopic(topicByChatGPT)]);
   }
 
   function writeMessage(userType: UserType, message: string) {
     setMessages([...messages, { userType, message }]);
   }
 
-  function getMedia() {
-    return videos[0] || mainVideo;
+  function getMediaSrc() {
+    return videos.at(0)?.src || getMainVideoSrc();
   }
 
   function onVideoClick(e: React.MouseEvent<HTMLVideoElement>) {
@@ -132,14 +108,18 @@ function App() {
 
   async function onVideoPlay(e: React.SyntheticEvent<HTMLVideoElement>) {
     try {
-      /* @ts-ignore */
-      const content = (await axios.get<string>(subtitlesDatabase[getMedia()])).data;
-
-      if (messages.at(-1)!.message === content) {
+      if (!videos.at(0)?.video) {
         return;
       }
 
-      writeMessage(UserType.bot, content);
+      /* @ts-ignore */
+      const content = await getAnswerTextByVideo(videos.at(0)?.video);
+
+      if (messages.at(-1)!.message === content.message) {
+        return;
+      }
+
+      writeMessage(UserType.bot, content.message);
     } catch (e) { }
   }
 
@@ -154,32 +134,32 @@ function App() {
 
   return (
     <div className='app-main'>
-      <Player cref={videoRef} onClick={onVideoClick} onPlay={onVideoPlay} className='avatar' src={getMedia()} onEnded={getNextVideo} autoPlay />
+      <Player cref={videoRef} onClick={onVideoClick} onDoubleClick={getNextVideo} onPlay={onVideoPlay} className='avatar' src={getMediaSrc()} onEnded={getNextVideo} autoPlay />
       <div className='chat-container'>
-        <div className="chat-header">
-          <div className="chat-header-avatar">
+        <div className='chat-header'>
+          <div className='chat-header-avatar'>
             J
           </div>
-          <div className="chat-header-info">
-            <h3 className="chat-header-info-title">John Doe</h3>
-            <p className="chat-header-info-content">last seen 2h ago</p>
+          <div className='chat-header-info'>
+            <h3 className='chat-header-info-title'>John Doe</h3>
+            <p className='chat-header-info-content'>last seen 2h ago</p>
           </div>
         </div>
         <div ref={chatContainer} className='chat-placeholder'>
-          {messages.map((message, index) => {
-            return (
-              <div className={`chat-placeholder-bubble ${message.userType === UserType.bot ? "bot" : "user"}`} key={`${message}${index}`}>
-                {message.message}
+          {
+            messages.map((message, index) =>
+              <div className={`chat-placeholder-bubble ${message.userType === UserType.bot ? 'bot' : 'user'}`} key={`${message}${index}`}>
+                <p dangerouslySetInnerHTML={{ __html: message.message.replace(/\n/g, '<br />') }}></p>
               </div>
-            );
-          })}
+            )
+          }
         </div>
-        <div className="chat-actions">
+        <div className='chat-actions'>
           <input
             ref={inputRef}
             type='text'
             className='chat-actions-input'
-            placeholder='Your question here!'
+            placeholder='¡Tu pregunta aquí!'
             maxLength={1000}
             onKeyDown={onButtonClick}
             onChange={() => setSendBtnDisabled(!inputRef.current?.value)}

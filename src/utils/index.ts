@@ -1,5 +1,7 @@
 import { Configuration, OpenAIApi } from 'openai';
 import { Input, Synthesia, SynthesiaCreateVideo, SynthesiaGetVideo, SynthesiaVideoResponse } from '../../lib/synthesia';
+import 'lostjs';
+import axios from 'axios';
 
 export function debug(): boolean {
     return import.meta.env.VITE_DEBUG;
@@ -51,15 +53,26 @@ export async function getSynthesiaVideo(text: string, notify: (response: Synthes
 }
 
 export async function getOpenaiAnswer(text: string) {
+    // Textos: "Cuidado del cuerpo", "Esperar del futuro", "Futuro", "Extrañar a alguien", "Carencia", "Falta" y "Escasez".
+    // Responde únicamente con uno de los textos que se acerque a lo que se refiere la siguiente sentencia, si nunguna de ellas encaja, response con "None".:
+    const header = `
+"Lana", "plata", "guita" y "varo" significan "Dinero".
+Analiza las siguientes condiciones y devuelve únicamente el valor de la variable "Resultado".
+"Texto" habla sobre familia o familiares. Resultado: Familia.
+"Texto" habla sobre obtener más dinero, ganar más dinero, anhelar más dinero o desear más dinero. Resultado: Ganar dinero.
+"Texto" habla extrañar a otras personas. Resultado: Extrañar a alguien.
+"Texto" habla sobre cuidado personal, mejora del cuerpo, salud, ejercicios o cuidado del cuerpo. Resultado: Cuidado del cuerpo.
+"Texto" habla sobre escasez, falta de algo material o deseo de conseguir algo material diferente al dinero. Resultado: Escasez.
+"Texto" habla sobre la confianza en uno mismo o la carencia de esta. Resultado: Confianza en uno mismo.
+"Texto" habla sobre el futuro, planes futuros o deseos para el futuro. Resultado: Futuro.
+"Texto" habla sobre el cuidado de los hijos, ayudar a los hijos, mejorar el comportamiento de los hijos o criar a los hijos. Resultado: Ayudar hijos.
+"Texto" no encaja con ningúna de las condiciones anteriores. Resultado: Ninguno.
+Texto: 
+`.trim();
     const configuration = new Configuration({
         apiKey: import.meta.env.VITE_OPENAI_SECRET_KEY,
     });
     const openai = new OpenAIApi(configuration);
-    // const header = 'Answer in one word or "None". Which of the following strings "Love", "Friendship", "Feelings", "Work", "Money" describes better the following text?:';
-    const header = `
-Textos: "Cuidado del cuerpo", "Esperar del futuro", "Futuro", "Extrañar a alguien", "Carencia", "Falta" y "Escasez".
-Responde únicamente con uno de los textos que se acerque a lo que se refiere la siguiente sentencia, si nunguna de ellas encaja, response con "None".:
-`.trim();
     const prompt = header + ' ' + text.trim();
 
     if (debug()) {
@@ -79,4 +92,81 @@ Responde únicamente con uno de los textos que se acerque a lo que se refiere la
     }
 
     return completion.data.choices[0].text;
+}
+
+interface IVideoElement {
+    topic: string,
+    video: string | string[];
+}
+
+const videoMain = 'santa-main';
+const videoUnknown = 'santa-no-sé';
+const videosDatabase: IVideoElement[] = [
+    {
+        topic: 'Futuro',
+        video: 'santa-escasez'
+    },
+    {
+        topic: 'Extrañar a alguien',
+        video: 'santa-extrañas-a-alguien'
+    },
+    {
+        topic: 'Cuidado del cuerpo',
+        video: 'santa-cuidado-del-cuerpo'
+    },
+    {
+        topic: 'Escasez',
+        video: 'santa-escasez'
+    },
+    {
+        topic: 'Confianza en uno mismo',
+        video: 'santa-confias-en-tí'
+    },
+    {
+        topic: 'Ayudar hijos',
+        video: 'santa-quieres-cambiar-la-vida-de-tus-hijos'
+    },
+    {
+        topic: 'Ganar dinero',
+        video: 'santa-quieres-ganar-más-dinero'
+    }
+];
+
+export interface IVideo { src: string, video: string; }
+interface IMessage { message: string; }
+
+function getMainVideo() {
+    return videoMain;
+}
+
+export function getMainVideoSrc() {
+    return `/${getMainVideo()}.mp4`;
+}
+
+export async function getAnswerTextByVideo(video: string): Promise<IMessage> {
+    return {
+        message: (await axios.get<string>(`/subtitles/${video}.txt`)).data
+    };
+}
+
+export function getAnswerByTopic(topic: string): IVideo {
+    const answer = videosDatabase.find((element) => element.topic === topic);
+
+    if (answer) {
+        let src = answer.video;
+
+        if (src instanceof Array) {
+            src = src.random();
+        }
+
+        return {
+            video: src,
+            src: `/${src}.mp4`,
+        };
+    }
+
+    return {
+        video: videoUnknown,
+        src: `/${videoUnknown}.mp4`,
+    };
 }
