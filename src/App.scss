@@ -16,12 +16,13 @@
   @apply flex shadow-xl w-screen h-screen z-10;
 }
 
-.loading {
-  @apply absolute h-full;
-}
-
 .avatar {
   @apply w-full h-full object-cover object-center lg:w-8/12 transition-opacity z-10;
+}
+
+.loading {
+  @extend .avatar;
+  @apply absolute object-cover;
 }
 
 .chat-container {
