@@ -60,20 +60,16 @@ function App() {
     }
 
     if (debug()) {
-      console.time('OpenAI');
+      console.time('IA');
     }
 
-    // const topicByChatGPT = ((await getOpenaiAnswer(question))!.split('\n\n')[1] || '').trim().replace(''', '');
+    const regex = /Resultado:\s+([^\.]+)\./;
     const topicByChatGPT = (await getOpenaiAnswer(question))!
-      .split('\n\n')[1]
-      .trim()
-      .replace('Resultado: ', '')
-      .replace('.', '');
+      .match(regex)![1] || 'Ninguno';
 
-    // return writeMessage(UserType.bot, question);
 
     if (debug()) {
-      console.timeEnd('OpenAI');
+      console.timeEnd('IA');
     }
 
     writeMessage(UserType.user, question);
@@ -81,7 +77,7 @@ function App() {
     setSendBtnDisabled(true);
 
     if (debug()) {
-      console.log('OpenAI text:', topicByChatGPT);
+      console.log('IA text:', topicByChatGPT);
     }
 
     /* @ts-ignore */
@@ -134,7 +130,17 @@ function App() {
 
   return (
     <div className='app-main'>
-      <Player cref={videoRef} onClick={onVideoClick} onDoubleClick={getNextVideo} onPlay={onVideoPlay} className='avatar' src={getMediaSrc()} onEnded={getNextVideo} autoPlay />
+      <Player
+        className='avatar'
+        onClick={onVideoClick}
+        onDoubleClick={getNextVideo}
+        onPlay={onVideoPlay}
+        src={getMediaSrc()}
+        onEnded={getNextVideo}
+        preload='auto'
+        cref={videoRef}
+        autoPlay
+      />
       <div className='chat-container'>
         <div className='chat-header'>
           <div className='chat-header-avatar'>

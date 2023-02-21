@@ -79,7 +79,7 @@ Analiza las siguientes condiciones y devuelve únicamente el valor de la variabl
 "Texto" habla sobre la confianza en uno mismo o la carencia de esta. Resultado: Confianza en uno mismo.
 "Texto" habla sobre el futuro, planes futuros o deseos para el futuro. Resultado: Futuro.
 "Texto" habla sobre el cuidado de los hijos, el comportamiento de los hijos, la actitud de los hijos, ayudar a los hijos, mejorar el comportamiento de los hijos o criar a los hijos. Resultado: Ayudar hijos.
-"Texto" no encaja con ningúna de las condiciones anteriores. Resultado: Ninguno.
+"Texto" no cumple ninguna de las condiciones anteriores. Resultado: Ninguno.
 Texto: 
 `.trim();
     const configuration = new Configuration({
@@ -93,7 +93,7 @@ Texto:
     }
 
     const completion = await openai.createCompletion({
-        model: 'text-davinci-002',
+        model: 'text-davinci-003',
         prompt,
         temperature: 0.6,
         max_tokens: 50,
