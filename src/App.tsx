@@ -10,6 +10,8 @@ import {
   IVideo,
 } from "./utils";
 import SendSVG from "./components/common/SendSVG";
+import santa from '/santa.png';
+
 
 /* 
 1 - ¿Cómo puedo cuidar mi cuerpo?
@@ -130,7 +132,7 @@ function App() {
       }
 
       writeMessage(UserType.bot, content.message);
-    } catch (e) {}
+    } catch (e) { }
   }
 
   function getNextVideo() {
@@ -144,6 +146,7 @@ function App() {
 
   return (
     <div className='app-main'>
+      <img className='loading' src={santa} title='santa' />
       <Player
         className='avatar'
         onClick={onVideoClick}
@@ -168,9 +171,8 @@ function App() {
         <div ref={chatContainer} className="chat-placeholder">
           {messages.map((message, index) => (
             <div
-              className={`chat-placeholder-bubble ${
-                message.userType === UserType.bot ? "bot" : "user"
-              }`}
+              className={`chat-placeholder-bubble ${message.userType === UserType.bot ? "bot" : "user"
+                }`}
               key={`${message}${index}`}
             >
               <p

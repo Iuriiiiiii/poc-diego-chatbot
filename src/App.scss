@@ -16,16 +16,19 @@
   @apply flex shadow-xl w-screen h-screen z-10;
 }
 
+.loading {
+  @apply absolute h-full;
+}
+
 .avatar {
-  @apply w-full object-cover object-center lg:w-8/12;
+  @apply w-full h-full object-cover object-center lg:w-8/12 transition-opacity z-10;
 }
 
 .chat-container {
-  @apply flex flex-col flex-grow bg-white absolute bottom-6 h-1/3 w-4/5 lg:relative lg:h-full lg:bottom-0;
+  @apply flex flex-col flex-grow bg-white absolute bottom-0 h-1/3 w-full lg:relative lg:h-full lg:bottom-0 z-10;
   @screen lg {
     margin-left: 0;
   }
-  margin-left: 10%;
 }
 
 .chat-header {
