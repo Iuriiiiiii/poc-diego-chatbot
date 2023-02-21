@@ -1,8 +1,15 @@
-import React, { useEffect, useRef, useState } from 'react';
-import './App.scss';
-import Player from './components/Player';
-import { debug, getAnswerByTopic, getAnswerTextByVideo, getMainVideoSrc, getOpenaiAnswer, IVideo } from './utils';
-import SendSVG from './components/common/SendSVG';
+import React, { useEffect, useRef, useState } from "react";
+import "./App.scss";
+import Player from "./components/Player";
+import {
+  debug,
+  getAnswerByTopic,
+  getAnswerTextByVideo,
+  getMainVideoSrc,
+  getOpenaiAnswer,
+  IVideo,
+} from "./utils";
+import SendSVG from "./components/common/SendSVG";
 
 /* 
 1 - ¿Cómo puedo cuidar mi cuerpo?
@@ -13,11 +20,11 @@ import SendSVG from './components/common/SendSVG';
 
 const enum UserType {
   bot,
-  user
+  user,
 }
 
 interface MessageType {
-  userType: UserType,
+  userType: UserType;
   message: string;
 }
 
@@ -40,12 +47,19 @@ function App() {
     }
 
     if (debug()) {
-      console.log('Video: ', videos.at(-1)?.src || getMainVideoSrc());
+      console.log("Video: ", videos.at(-1)?.src || getMainVideoSrc());
     }
   }, [videos.length]);
 
-  async function onButtonClick(e: React.MouseEvent<HTMLButtonElement> | React.KeyboardEvent<HTMLInputElement>) {
-    if (e.type === 'keydown' && (e as React.KeyboardEvent<HTMLInputElement>).code !== 'Enter') {
+  async function onButtonClick(
+    e:
+      | React.MouseEvent<HTMLButtonElement>
+      | React.KeyboardEvent<HTMLInputElement>
+  ) {
+    if (
+      e.type === "keydown" &&
+      (e as React.KeyboardEvent<HTMLInputElement>).code !== "Enter"
+    ) {
       return;
     }
 
@@ -55,33 +69,33 @@ function App() {
 
     const question = inputRef.current!.value;
 
-    if (question === '') {
+    if (question === "") {
       return;
     }
 
     if (debug()) {
-      console.time('OpenAI');
+      console.time("OpenAI");
     }
 
     // const topicByChatGPT = ((await getOpenaiAnswer(question))!.split('\n\n')[1] || '').trim().replace(''', '');
     const topicByChatGPT = (await getOpenaiAnswer(question))!
-      .split('\n\n')[1]
+      .split("\n\n")[1]
       .trim()
-      .replace('Resultado: ', '')
-      .replace('.', '');
+      .replace("Resultado: ", "")
+      .replace(".", "");
 
     // return writeMessage(UserType.bot, question);
 
     if (debug()) {
-      console.timeEnd('OpenAI');
+      console.timeEnd("OpenAI");
     }
 
     writeMessage(UserType.user, question);
-    inputRef.current!.value = '';
+    inputRef.current!.value = "";
     setSendBtnDisabled(true);
 
     if (debug()) {
-      console.log('OpenAI text:', topicByChatGPT);
+      console.log("OpenAI text:", topicByChatGPT);
     }
 
     /* @ts-ignore */
@@ -120,7 +134,7 @@ function App() {
       }
 
       writeMessage(UserType.bot, content.message);
-    } catch (e) { }
+    } catch (e) {}
   }
 
   function getNextVideo() {
@@ -133,42 +147,63 @@ function App() {
   }
 
   return (
-    <div className='app-main'>
-      <Player cref={videoRef} onClick={onVideoClick} onDoubleClick={getNextVideo} onPlay={onVideoPlay} className='avatar' src={getMediaSrc()} onEnded={getNextVideo} autoPlay />
-      <div className='chat-container'>
-        <div className='chat-header'>
-          <div className='chat-header-avatar'>
-            J
-          </div>
-          <div className='chat-header-info'>
-            <h3 className='chat-header-info-title'>John Doe</h3>
-            <p className='chat-header-info-content'>last seen 2h ago</p>
+    <div className="app-main">
+      <Player
+        cref={videoRef}
+        onClick={onVideoClick}
+        onDoubleClick={getNextVideo}
+        onPlay={onVideoPlay}
+        className="avatar"
+        src={getMediaSrc()}
+        onEnded={getNextVideo}
+        autoPlay
+      />
+      <div className="chat-container">
+        <div className="chat-header">
+          <div className="chat-header-avatar">J</div>
+          <div className="chat-header-info">
+            <h3 className="chat-header-info-title">John Doe</h3>
+            <p className="chat-header-info-content">last seen 2h ago</p>
           </div>
         </div>
-        <div ref={chatContainer} className='chat-placeholder'>
-          {
-            messages.map((message, index) =>
-              <div className={`chat-placeholder-bubble ${message.userType === UserType.bot ? 'bot' : 'user'}`} key={`${message}${index}`}>
-                <p dangerouslySetInnerHTML={{ __html: message.message.replace(/\n/g, '<br />') }}></p>
-              </div>
-            )
-          }
+        <div ref={chatContainer} className="chat-placeholder">
+          {messages.map((message, index) => (
+            <div
+              className={`chat-placeholder-bubble ${
+                message.userType === UserType.bot ? "bot" : "user"
+              }`}
+              key={`${message}${index}`}
+            >
+              <p
+                dangerouslySetInnerHTML={{
+                  __html: message.message.replace(/\n/g, "<br />"),
+                }}
+              ></p>
+            </div>
+          ))}
         </div>
-        <div className='chat-actions'>
+        <div className="chat-actions">
           <input
             ref={inputRef}
-            type='text'
-            className='chat-actions-input'
-            placeholder='¡Tu pregunta aquí!'
+            type="text"
+            className="chat-actions-input"
+            placeholder="¡Tu pregunta aquí!"
             maxLength={1000}
             onKeyDown={onButtonClick}
             onChange={() => setSendBtnDisabled(!inputRef.current?.value)}
           />
-          <button onClick={onButtonClick} type='button' className='chat-actions-send' disabled={sendBtnDisabled}><SendSVG /></button>
+          <button
+            onClick={onButtonClick}
+            type="button"
+            className="chat-actions-send"
+            disabled={sendBtnDisabled}
+          >
+            <SendSVG />
+          </button>
         </div>
       </div>
     </div>
   );
-};
+}
 
 export default App;
