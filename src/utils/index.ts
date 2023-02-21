@@ -52,20 +52,33 @@ export async function getSynthesiaVideo(text: string, notify: (response: Synthes
 
 }
 
+/*
+Extraño mucho a mi mejor amiga
+Quiero conseguir más lana
+¿Cómo puedo conseguir mas guita?
+Amo a mi familia.
+Mi hermana se fue de viaje, quisiera verla.
+Quiero estar mas saludable ¿Qué puedo hacer?
+Me siento muy cansado todo el tiempo.
+No tengo mucha confianza.
+Espero poder viajar algún día.
+Algún día tendré una casa grande y familia?
+Mis hijos se comportan terriblemente, no sé que hacer.
+
+*/
+
 export async function getOpenaiAnswer(text: string) {
-    // Textos: "Cuidado del cuerpo", "Esperar del futuro", "Futuro", "Extrañar a alguien", "Carencia", "Falta" y "Escasez".
-    // Responde únicamente con uno de los textos que se acerque a lo que se refiere la siguiente sentencia, si nunguna de ellas encaja, response con "None".:
+    // "Texto" habla sobre familia o familiares. Resultado: Familia.
     const header = `
 "Lana", "plata", "guita" y "varo" significan "Dinero".
 Analiza las siguientes condiciones y devuelve únicamente el valor de la variable "Resultado".
-"Texto" habla sobre familia o familiares. Resultado: Familia.
 "Texto" habla sobre obtener más dinero, ganar más dinero, anhelar más dinero o desear más dinero. Resultado: Ganar dinero.
-"Texto" habla extrañar a otras personas. Resultado: Extrañar a alguien.
+"Texto" habla extrañar a otras personas, querer ver o estar cerca de personas. Resultado: Extrañar a alguien.
 "Texto" habla sobre cuidado personal, mejora del cuerpo, salud, ejercicios o cuidado del cuerpo. Resultado: Cuidado del cuerpo.
 "Texto" habla sobre escasez, falta de algo material o deseo de conseguir algo material diferente al dinero. Resultado: Escasez.
 "Texto" habla sobre la confianza en uno mismo o la carencia de esta. Resultado: Confianza en uno mismo.
 "Texto" habla sobre el futuro, planes futuros o deseos para el futuro. Resultado: Futuro.
-"Texto" habla sobre el cuidado de los hijos, ayudar a los hijos, mejorar el comportamiento de los hijos o criar a los hijos. Resultado: Ayudar hijos.
+"Texto" habla sobre el cuidado de los hijos, el comportamiento de los hijos, la actitud de los hijos, ayudar a los hijos, mejorar el comportamiento de los hijos o criar a los hijos. Resultado: Ayudar hijos.
 "Texto" no encaja con ningúna de las condiciones anteriores. Resultado: Ninguno.
 Texto: 
 `.trim();
