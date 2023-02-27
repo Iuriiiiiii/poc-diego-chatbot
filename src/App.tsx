@@ -65,7 +65,7 @@ function App() {
       return;
     }
 
-    if(sendBtnDisabled) {
+    if (sendBtnDisabled) {
       return;
     }
 
@@ -84,9 +84,14 @@ function App() {
     }
 
     const regex = /Resultado:\s+([^\.]+)\./;
-    const topicByChatGPT = (await getOpenaiAnswer(question))!
-      .match(regex)![1] || 'Ninguno';
+    const aiAnswer = (await getOpenaiAnswer(question))!;
+    let topicByChatGPT;
 
+    if (import.meta.env.VITE_AI_MODEL === 'text-davinci-002') {
+      topicByChatGPT = aiAnswer!.split('\n\n')[1] || 'Ninguno';
+    } else {
+      topicByChatGPT = aiAnswer.match(regex)![1] || 'Ninguno';
+    }
 
     if (debug()) {
       console.timeEnd('IA');
@@ -149,7 +154,7 @@ function App() {
   }
 
   function isVideoPlaying(video: HTMLVideoElement | null) {
-    if(!video) {
+    if (!video) {
       return false;
     }
 

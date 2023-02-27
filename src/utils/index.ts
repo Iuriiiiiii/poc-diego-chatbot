@@ -69,12 +69,14 @@ Mis hijos se comportan terriblemente, no sé que hacer.
 
 export async function getOpenaiAnswer(text: string) {
     // "Texto" habla sobre familia o familiares. Resultado: Familia.
+// Analiza las siguientes condiciones y devuelve únicamente el valor de la variable "Resultado".
+
     const header = `
 "Lana", "plata", "guita" y "varo" significan "Dinero".
-Analiza las siguientes condiciones y devuelve únicamente el valor de la variable "Resultado".
+Sigue el siguiente formato: Condición. Resultado.
 "Texto" habla sobre obtener más dinero, ganar más dinero, anhelar más dinero o desear más dinero. Resultado: Ganar dinero.
-"Texto" habla extrañar a otras personas, querer ver o estar cerca de personas. Resultado: Extrañar a alguien.
-"Texto" habla sobre cuidado personal, mejora del cuerpo, salud, ejercicios o cuidado del cuerpo. Resultado: Cuidado del cuerpo.
+"Texto" habla sobre extrañar a personas, desear ver y/o estar cerca de personas. Resultado: Extrañar a alguien.
+"Texto" habla sobre cuidado personal, mejorar el cuerpo, mejorar la condición, salud, ejercicios o cuidado del cuerpo. Resultado: Cuidado del cuerpo.
 "Texto" habla sobre escasez, falta de algo material, esperar conseguir algo en el futuro o deseo de conseguir algo material diferente al dinero. Resultado: Escasez.
 "Texto" habla sobre la confianza en uno mismo o la carencia de esta. Resultado: Confianza en uno mismo.
 "Texto" habla sobre el futuro, planes futuros o deseos para el futuro. Resultado: Futuro.
@@ -93,7 +95,7 @@ Texto:
     }
 
     const completion = await openai.createCompletion({
-        model: 'text-davinci-003',
+        model: import.meta.env.VITE_AI_MODEL,
         prompt,
         temperature: 0.6,
         max_tokens: 50,
