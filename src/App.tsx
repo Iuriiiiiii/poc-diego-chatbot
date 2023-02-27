@@ -12,14 +12,6 @@ import {
 import SendSVG from "./components/common/SendSVG";
 import santa from '/santa.png';
 
-
-/* 
-1 - ¿Cómo puedo cuidar mi cuerpo?
-2 - Hacen falta cosas en mi vida. ¿Cómo puedo solventarlo?
-3 - Cómo puedo conseguir más dinero?
-4 - Extraño mucho a mi Ex, quiero recuperarla.
-*/
-
 const enum UserType {
   bot,
   user,
