@@ -65,6 +65,10 @@ function App() {
       return;
     }
 
+    if(sendBtnDisabled) {
+      return;
+    }
+
     if (!inputRef) {
       return;
     }
@@ -144,6 +148,14 @@ function App() {
     setVideos([...videos]);
   }
 
+  function isVideoPlaying(video: HTMLVideoElement | null) {
+    if(!video) {
+      return false;
+    }
+
+    return !!(video.currentTime > 0 && !video.paused && !video.ended && video.readyState > 2);
+  }
+
   return (
     <div className='app-main'>
       <img className='loading' src={santa} title='santa' />
@@ -191,7 +203,7 @@ function App() {
             placeholder="¡Tu pregunta aquí!"
             maxLength={1000}
             onKeyDown={onButtonClick}
-            onChange={() => setSendBtnDisabled(!inputRef.current?.value)}
+            onChange={() => setSendBtnDisabled(isVideoPlaying(videoRef.current))}
           />
           <button
             onClick={onButtonClick}
