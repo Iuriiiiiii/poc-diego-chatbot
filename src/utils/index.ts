@@ -115,7 +115,7 @@ interface IVideoElement {
 }
 
 const videoMain = 'santa-main';
-const videoUnknown = 'santa-no-sé';
+const videoUnknown = 'default';
 const videosDatabase: IVideoElement[] = [
     {
         topic: 'Futuro',
@@ -127,7 +127,7 @@ const videosDatabase: IVideoElement[] = [
     },
     {
         topic: 'Cuidado del cuerpo',
-        video: 'santa-cuidado-del-cuerpo'
+        video: 'cuerpo'
     },
     {
         topic: 'Escasez',
@@ -135,7 +135,7 @@ const videosDatabase: IVideoElement[] = [
     },
     {
         topic: 'Confianza en uno mismo',
-        video: 'santa-confias-en-tí'
+        video: 'sentir'
     },
     {
         topic: 'Ayudar hijos',
@@ -143,7 +143,7 @@ const videosDatabase: IVideoElement[] = [
     },
     {
         topic: 'Ganar dinero',
-        video: 'santa-quieres-ganar-más-dinero'
+        video: 'dinero'
     }
 ];
 
