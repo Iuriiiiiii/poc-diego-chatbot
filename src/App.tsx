@@ -148,7 +148,6 @@ function App() {
       /* @ts-ignore */
       const content = await getAnswerTextByVideo(videos.at(0)?.video);
       const lastBotMessage = getLastBotMessage();
-      console.log(lastBotMessage?.message, "-------------", content.message);
 
       if (lastBotMessage?.message === content.message) {
         return;
