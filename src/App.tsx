@@ -32,7 +32,7 @@ function App() {
   const [messages, setMessages] = useState<MessageType[]>([]);
   /* filo stack */
   const [videos, setVideos] = useState<IVideo[]>([]);
-  const [sendBtnDisabled, setSendBtnDisabled] = useState(true);
+  const [sendBtnDisabled, setSendBtnDisabled] = useState(false);
   const [context, setContext] = useState<VideoStatus>(VideoStatus.stopped);
   const providerValue: IVideoContext = {
     status: context,
@@ -53,6 +53,10 @@ function App() {
     }
   }, [videos.length]);
 
+  // useEffect(() => {
+  //   setSendBtnDisabled(context === VideoStatus.playing);
+  // }, [context, inputRef.current?.innerText.length]);
+
   async function onButtonClick(
     e:
       | React.MouseEvent<HTMLButtonElement>
@@ -64,7 +68,7 @@ function App() {
     ) {
       return;
     }
-
+    // console.log(sendBtnDisabled);
     if (sendBtnDisabled) {
       return;
     }
@@ -85,7 +89,7 @@ function App() {
 
     const regex = /Resultado:\s+([^\.]+)\./;
     const aiAnswer = (await getOpenaiAnswer(question))!;
-    let topicByChatGPT;
+    let topicByChatGPT: string;
 
     if (import.meta.env.VITE_AI_MODEL === "text-davinci-002") {
       topicByChatGPT = aiAnswer!.split("\n\n")[1] || "Ninguno";
@@ -99,7 +103,7 @@ function App() {
 
     writeMessage(UserType.user, question);
     inputRef.current!.value = "";
-    setSendBtnDisabled(true);
+    // setSendBtnDisabled(true);
 
     if (debug()) {
       console.log("IA text:", topicByChatGPT);
@@ -127,6 +131,12 @@ function App() {
     current.pause();
   }
 
+  function getLastBotMessage() {
+    return [...messages]
+      .reverse()
+      .find((message) => message.userType == UserType.bot);
+  }
+
   async function onVideoPlay(e: React.SyntheticEvent<HTMLVideoElement>) {
     try {
       setContext(VideoStatus.playing);
@@ -137,8 +147,10 @@ function App() {
 
       /* @ts-ignore */
       const content = await getAnswerTextByVideo(videos.at(0)?.video);
+      const lastBotMessage = getLastBotMessage();
+      console.log(lastBotMessage?.message, "-------------", content.message);
 
-      if (messages.at(-1)!.message === content.message) {
+      if (lastBotMessage?.message === content.message) {
         return;
       }
 
@@ -209,9 +221,6 @@ function App() {
               placeholder="¡Tu pregunta aquí!"
               maxLength={1000}
               onKeyDown={onButtonClick}
-              onChange={() =>
-                setSendBtnDisabled(isVideoPlaying(videoRef.current))
-              }
             />
             <button
               onClick={onButtonClick}

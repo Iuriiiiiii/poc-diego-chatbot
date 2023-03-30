@@ -29,8 +29,6 @@ const Player = (props: Props & IntrinsicAttributes) => {
     const ref = props.cref!;
     const { status } = useContext<IVideoContext>(VideoContext);
 
-    console.log(status);
-
     return (
       <div className="absolute top-5 left-3 z-40">
         <button

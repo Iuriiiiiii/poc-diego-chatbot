@@ -106,19 +106,27 @@ Texto:
     console.log("OpenAI Prompt:", prompt);
   }
 
-  const completion = await openai.createCompletion({
-    model: import.meta.env.VITE_AI_MODEL,
-    prompt,
-    temperature: 0.6,
-    max_tokens: 50,
-    n: 1,
-  });
+  try {
+    const completion = await openai.createCompletion({
+      model: import.meta.env.VITE_AI_MODEL,
+      prompt,
+      temperature: 0.6,
+      max_tokens: 50,
+      n: 1,
+    });
 
-  if (debug()) {
-    console.log("OpenAI Result:", completion.data.choices);
+    if (debug()) {
+      console.log("OpenAI Result:", completion.data.choices);
+    }
+
+    return completion.data.choices[0].text;
+  } catch (error) {
+    if (debug()) {
+      console.error(error);
+    }
+
+    return "Ninguno";
   }
-
-  return completion.data.choices[0].text;
 }
 
 interface IVideoElement {
