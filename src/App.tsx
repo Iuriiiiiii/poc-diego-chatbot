@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import "./App.scss";
 import Player from "./components/Player";
 import {
@@ -8,9 +8,12 @@ import {
   getMainVideoSrc,
   getOpenaiAnswer,
   IVideo,
+  isVideoPlaying,
 } from "./utils";
 import SendSVG from "./components/common/SendSVG";
-import santa from '/santa.png';
+import santa from "/santa.png";
+import { IVideoContext, VideoStatus } from "./interfaces";
+import { VideoContext } from "./contexts";
 
 const enum UserType {
   bot,
@@ -30,6 +33,11 @@ function App() {
   /* filo stack */
   const [videos, setVideos] = useState<IVideo[]>([]);
   const [sendBtnDisabled, setSendBtnDisabled] = useState(true);
+  const [context, setContext] = useState<VideoStatus>(VideoStatus.stopped);
+  const providerValue: IVideoContext = {
+    status: context,
+    setStatus: setContext,
+  };
 
   useEffect(() => {
     chatContainer.current!.scrollTo({ top: Number.MAX_SAFE_INTEGER });
@@ -72,21 +80,21 @@ function App() {
     }
 
     if (debug()) {
-      console.time('IA');
+      console.time("IA");
     }
 
     const regex = /Resultado:\s+([^\.]+)\./;
     const aiAnswer = (await getOpenaiAnswer(question))!;
     let topicByChatGPT;
 
-    if (import.meta.env.VITE_AI_MODEL === 'text-davinci-002') {
-      topicByChatGPT = aiAnswer!.split('\n\n')[1] || 'Ninguno';
+    if (import.meta.env.VITE_AI_MODEL === "text-davinci-002") {
+      topicByChatGPT = aiAnswer!.split("\n\n")[1] || "Ninguno";
     } else {
-      topicByChatGPT = aiAnswer.match(regex)![1] || 'Ninguno';
+      topicByChatGPT = aiAnswer.match(regex)![1] || "Ninguno";
     }
 
     if (debug()) {
-      console.timeEnd('IA');
+      console.timeEnd("IA");
     }
 
     writeMessage(UserType.user, question);
@@ -94,7 +102,7 @@ function App() {
     setSendBtnDisabled(true);
 
     if (debug()) {
-      console.log('IA text:', topicByChatGPT);
+      console.log("IA text:", topicByChatGPT);
     }
 
     /* @ts-ignore */
@@ -121,6 +129,8 @@ function App() {
 
   async function onVideoPlay(e: React.SyntheticEvent<HTMLVideoElement>) {
     try {
+      setContext(VideoStatus.playing);
+
       if (!videos.at(0)?.video) {
         return;
       }
@@ -133,10 +143,12 @@ function App() {
       }
 
       writeMessage(UserType.bot, content.message);
-    } catch (e) { }
+    } catch (e) {}
   }
 
   function getNextVideo() {
+    setContext(VideoStatus.stopped);
+
     if (videos.length === 0) {
       return;
     }
@@ -145,74 +157,74 @@ function App() {
     setVideos([...videos]);
   }
 
-  function isVideoPlaying(video: HTMLVideoElement | null) {
-    if (!video) {
-      return false;
-    }
-
-    return !!(video.currentTime > 0 && !video.paused && !video.ended && video.readyState > 2);
+  function onVideoPause() {
+    setContext(VideoStatus.paused);
   }
 
   return (
-    <div className='app-main'>
-      <img className='loading' src={santa} title='santa' />
-      <Player
-        className='avatar'
-        onClick={onVideoClick}
-        onDoubleClick={getNextVideo}
-        onPlay={onVideoPlay}
-        src={getMediaSrc()}
-        onEnded={getNextVideo}
-        preload='auto'
-        cref={videoRef}
-        autoPlay
-      />
-      <div className='chat-container'>
-        <div className='chat-header'>
-          <div className='chat-header-avatar'>
-            J
-          </div>
-          <div className='chat-header-info'>
-            <h3 className='chat-header-info-title'>John Doe</h3>
-            <p className='chat-header-info-content'>last seen 2h ago</p>
-          </div>
-        </div>
-        <div ref={chatContainer} className="chat-placeholder">
-          {messages.map((message, index) => (
-            <div
-              className={`chat-placeholder-bubble ${message.userType === UserType.bot ? "bot" : "user"
-                }`}
-              key={`${message}${index}`}
-            >
-              <p
-                dangerouslySetInnerHTML={{
-                  __html: message.message.replace(/\n/g, "<br />"),
-                }}
-              ></p>
+    <VideoContext.Provider value={providerValue}>
+      <div className="app-main">
+        <img className="loading" src={santa} title="santa" />
+        <Player
+          className="avatar"
+          onClick={onVideoClick}
+          onDoubleClick={getNextVideo}
+          onPlay={onVideoPlay}
+          onPause={onVideoPause}
+          src={getMediaSrc()}
+          onEnded={getNextVideo}
+          preload="auto"
+          cref={videoRef}
+          autoPlay
+        />
+        <div className="chat-container">
+          <div className="chat-header">
+            <div className="chat-header-avatar">J</div>
+            <div className="chat-header-info">
+              <h3 className="chat-header-info-title">John Doe</h3>
+              <p className="chat-header-info-content">last seen 2h ago</p>
             </div>
-          ))}
-        </div>
-        <div className="chat-actions">
-          <input
-            ref={inputRef}
-            type="text"
-            className="chat-actions-input"
-            placeholder="¡Tu pregunta aquí!"
-            maxLength={1000}
-            onKeyDown={onButtonClick}
-            onChange={() => setSendBtnDisabled(isVideoPlaying(videoRef.current))}
-          />
-          <button
-            onClick={onButtonClick}
-            type="button"
-            className="chat-actions-send"
-            disabled={sendBtnDisabled}
-          >
-            <SendSVG />
-          </button>
+          </div>
+          <div ref={chatContainer} className="chat-placeholder">
+            {messages.map((message, index) => (
+              <div
+                className={`chat-placeholder-bubble ${
+                  message.userType === UserType.bot ? "bot" : "user"
+                }`}
+                key={`${message}${index}`}
+              >
+                <p
+                  dangerouslySetInnerHTML={{
+                    __html: message.message.replace(/\n/g, "<br />"),
+                  }}
+                ></p>
+              </div>
+            ))}
+          </div>
+          <div className="chat-actions">
+            <input
+              ref={inputRef}
+              type="text"
+              className="chat-actions-input"
+              placeholder="¡Tu pregunta aquí!"
+              maxLength={1000}
+              onKeyDown={onButtonClick}
+              onChange={() =>
+                setSendBtnDisabled(isVideoPlaying(videoRef.current))
+              }
+            />
+            <button
+              onClick={onButtonClick}
+              type="button"
+              className="chat-actions-send"
+              disabled={sendBtnDisabled}
+            >
+              <SendSVG />
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </VideoContext.Provider>
   );
 }
 
