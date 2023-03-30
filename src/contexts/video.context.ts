@@ -1,5 +1,8 @@
 import React from "react";
-import { IVideoContext } from "../interfaces";
+import { IVideoContext, VideoStatus } from "../interfaces";
 
-export const defaultContext: IVideoContext = { playing: false };
+export const defaultContext: IVideoContext = {
+  status: VideoStatus.stopped,
+  setStatus: () => {},
+};
 export const VideoContext = React.createContext<IVideoContext>(defaultContext);
