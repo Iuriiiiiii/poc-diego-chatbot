@@ -147,7 +147,7 @@ const videosDatabase: IVideoElement[] = [
   },
   {
     topic: "Cuidado del cuerpo",
-    video: "cuerpo",
+    video: "diego-cuidado-del-cuerpo",
   },
   {
     topic: "Escasez",
