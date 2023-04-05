@@ -10,6 +10,7 @@ import "lostjs";
 import axios from "axios";
 
 export function debug(): boolean {
+  console.log(import.meta.env.VITE_DEBUG);
   return import.meta.env.VITE_DEBUG;
 }
 
